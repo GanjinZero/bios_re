@@ -4,8 +4,8 @@ import torch
 import os
 import numpy as np
 #import opennre
-sys.path.append('/raid/zheng')
-from OpenNRE import opennre
+sys.path.append('..')
+import opennre
 import argparse
 import logging
 import random

@@ -120,7 +120,11 @@ class BagRE(nn.Module):
                 args = data[3:]
                 #logits = self.model(label, scope, *args, bag_size=self.bag_size)
                 logits = self.model(label, scope, *args, bag_size=0)
-                loss = self.criterion(logits, label)
+                # HARD CODE
+                #loss = self.criterion(logits, label)
+                # TODO
+                loss = F.binary(xxx)
+
                 score, pred = logits.max(-1) # (B)
                 acc = float((pred == label).long().sum()) / label.size(0)
                 pos_total = (label != 0).long().sum()
