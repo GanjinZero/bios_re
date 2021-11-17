@@ -23,7 +23,7 @@ parser.add_argument('--ckpt', default='',
         help='Checkpoint name')
 parser.add_argument('--result', default='', 
         help='Result name')
-parser.add_argument('--pooler', default='entity', choices=['cls', 'entity'], 
+parser.add_argument('--pooler', default='entity', choices=['cls', 'entity', 'coder'], 
         help='Sentence representation pooler')
 parser.add_argument('--only_test', action='store_true', 
         help='Only run test')
@@ -112,17 +112,23 @@ elif args.pooler == 'cls':
         pretrain_path=args.pretrain_path,
         mask_entity=args.mask_entity
     )
-else:
-    raise NotImplementedError
+elif args.pooler == 'coder':
+    sentence_encoder = opennre.encoder.BERTEntityEncoderCODER(
+        max_length=args.max_length, 
+        pretrain_path=args.pretrain_path,
+        mask_entity=args.mask_entity
+    )
 
 
 # Define the model
 if args.aggr == 'att':
+    raise NotImplementedError
     model = opennre.model.BagAttention(sentence_encoder, len(rel2id), rel2id)
 elif args.aggr == 'avg':
+    raise NotImplementedError
     model = opennre.model.BagAverage(sentence_encoder, len(rel2id), rel2id)
 elif args.aggr == 'one':
-    model = opennre.model.BagOne(sentence_encoder, len(rel2id), rel2id)
+    model = opennre.model.NewBagOne(sentence_encoder, len(rel2id), rel2id)
 else:
     raise NotImplementedError
 

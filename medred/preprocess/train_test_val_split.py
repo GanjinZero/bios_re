@@ -71,68 +71,41 @@ def output(rel_lines, na_lines,
         print(f'None NA Lines count:{nona_line_count}')
         return cui_pair.keys()
 
-def train_test_split(rel_path='../rxnorm_snomedctus_medrt_rel',
-                     na_path='../na_rel',
-                     output_path='../dataset/'):
+def train_test_split(rel_path='../../data/sentence_coder_1117.json',
+                     output_path='../../data/1117_v2/'):
 
     try:
         os.system(f'mkdir {output_path}')
     except BaseException:
         pass
 
-    rel_lines = {}
-    rel_lines_count = {}
-    na_lines = {}
-    na_lines_count = {}
+    train_set = set()
+    dev_set = set()
+    test_set = set()
+    u_count = 0
 
-    print('Load Rel Data')
-    filename_list = []
-    for filename in tqdm(os.listdir(rel_path)):
-        filename_list.append(filename)
-        with open(os.path.join(rel_path, filename), "r", encoding="utf-8") as f:
-            rel_lines[filename] = [line.strip() for line in f.readlines() if check(line)]
-        rel_lines_count[filename] = len(rel_lines[filename])
-
-    print('Load NA Data')
-    for filename in tqdm(os.listdir(na_path)):
-        with open(os.path.join(na_path, filename), "r", encoding="utf-8") as f:
-            na_lines[filename] = [line.strip() for line in f.readlines() if check(line)]
-        na_lines_count[filename] = len(na_lines[filename])
-    
-    test_filename_list = []
-    test_sentence_count = 0
-    dev_filename_list = []
-    dev_sentence_count = 0
-    for filename in filename_list[::-1]:
-        if test_sentence_count < 100000:
-            test_sentence_count += rel_lines_count[filename] + na_lines_count[filename]
-            test_filename_list.append(filename)
-        if test_sentence_count >= 100000 and dev_sentence_count < 500000:
-            dev_sentence_count += rel_lines_count[filename] + na_lines_count[filename]
-            dev_filename_list.append(filename)
-
-    print('Dev')
-    print(dev_filename_list)
-    print('Test')
-    print(test_filename_list)
-
-    test_cui_pair = output(rel_lines, na_lines, test_filename_list,
-           os.path.join(output_path, 'test.txt'),
-           None)
-
-    dev_cui_pair = output(rel_lines, na_lines, dev_filename_list,
-           os.path.join(output_path, 'dev.txt'),
-           test_cui_pair)
-
-    cui_pair = output(rel_lines, na_lines,
-           [filename for filename in filename_list if filename not in test_filename_list and filename not in dev_filename_list],
-           os.path.join(output_path, 'train.txt'),
-           set(test_cui_pair).update(list(dev_cui_pair)))
-    # cui_pair = output(rel_lines, na_lines,
-    #        filename_list[0:10],
-    #        os.path.join(output_path, 'train.txt'),
-    #        None)    
-
-
+    for line in tqdm(open(rel_path, 'r')):
+        rel_line = eval(line.strip())
+        cui0 = rel_line['h']['id']
+        cui1 = rel_line['t']['id']
+        cuis = "|".join([cui0, cui1])
+        if not (cuis in train_set or cuis in dev_set or cuis in test_set):
+            u_count += 1
+            if u_count % 100 == 47:
+                dev_set.update([cuis])
+            elif u_count % 100 == 72:
+                test_set.update([cuis])
+            else:
+                train_set.update([cuis])
+        if cuis in train_set:
+            with open(os.path.join(output_path, 'train.txt'), 'a+') as f:
+                f.write(line.strip() + "\n")
+        elif cuis in dev_set:
+            with open(os.path.join(output_path, 'dev.txt'), 'a+') as f:
+                f.write(line.strip() + "\n")
+        elif cuis in test_set:
+            with open(os.path.join(output_path, 'test.txt'), 'a+') as f:
+                f.write(line.strip() + "\n")
+   
 if __name__ == '__main__':
-    train_test_split(output_path="../dataset_v2")
+    train_test_split()
