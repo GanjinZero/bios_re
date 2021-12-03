@@ -6,6 +6,11 @@ from tqdm import tqdm
 import itertools
 import re
 import numpy as np
+from random import sample, random
+#from preprocess.load_bios import BIOS
+from load_bios import BIOS
+
+bios = BIOS('/platform_tech/wikidata/')
 
 ds_39g = {
     "raw_text_path": "/platform_tech/aigraph/data/39g_data/pubmed_abstract_title_0.25_fulltext.txt",
@@ -14,6 +19,9 @@ ds_39g = {
     "dataset_dir": "",
     "df_path": ""	
 }
+
+with open('../data/sty_pair.json', 'r') as f:
+    sty_pair = json.load(f)
 
 def read():
 
@@ -67,9 +75,12 @@ def read():
             cid_pair[cui_en2][0] = cid_pair[cui_en2][0] + (t_t[2], )
             cid_pair[cui_en2][1] = cid_pair[cui_en2][1] + (cui_en1, )
 
+    str_cid_keys = set(str_cid.keys())
+    cid_pair_keys = set(cid_pair.keys())
+
 ####begin matching 
     print("################begin matching##################")
-    writer = open('/platform_tech/yuanzheng/bios_re/data/1202/raw.json', 'w', encoding="utf-8") 
+    writer = open('/platform_tech/yuanzheng/bios_re/data/1203/raw_na_10.json', 'w', encoding="utf-8") 
     
     with open(ds_39g["raw_text_path"], 'r', encoding = 'utf-8') as fp1, open(ds_39g["tagged_text_path"], 'r', encoding = 'utf-8') as fp2:
         for l1 in tqdm(fp1):
@@ -82,6 +93,10 @@ def read():
             sen_list = sen.split(". ")
             
             for one_sen in sen_list:
+                u = random()
+                if u > 0.1:
+                    continue
+
                 left_idx = sen.index(one_sen)
                 right_idx = left_idx + len(one_sen)
                 need_tag = get_phrase(left_idx, right_idx, tag)
@@ -90,32 +105,32 @@ def read():
                 for i in range(len(need_tag)):
                 
                     x = need_tag[i]
-                    if x not in str_cid.keys():
+                    if x not in str_cid_keys:
                         continue
                     x_id = str_cid[x]
-                    if x_id not in cid_pair.keys():
+                    if x_id not in cid_pair_keys:
                         continue
-                        
-                    #for y in need_tag[i+1:]:
+                    x_sty = bios.cui2type[x_id][0]
+
                     for y in need_tag:
-                        if y not in str_cid.keys():
+                        if y not in str_cid_keys:
                             continue
                         y_id = str_cid[y]
-                        if y_id not in cid_pair[x_id][1]:
+                        if y_id not in cid_pair_keys:
+                            continue
+                        if y_id in cid_pair[x_id][1] or x_id in cid_pair[y_id][1] :
                             continue
                         if y_id == x_id:
+                            continue
+                        y_sty = bios.cui2type[y_id][0]
+                        if y_sty not in sty_pair['forward'][x_sty] and y_sty not in sty_pair['backward'][x_sty]:
                             continue
                             
                         dic['text'] = one_sen+"."
                         x_word = x
                         y_word = y
-                        if (x_word, y_word) in tri.keys():
-                            dic['relation'] = [rel[0] for rel in tri[(x_word,y_word)]]
-                            dic["Qid_pairs"] = [q[1] for q in tri[(x_word,y_word)]]
-                        else:
-                            rel_id = [i for i in np.where(np.array(cid_pair[x_id][1]) == y_id)[0]]
-                            dic['relation'] = list(set([cid_pair[x_id][0][x] for x in rel_id]))
-                            dic["Qid_pairs"] = ["NaN"]
+                        dic['relation'] = ["NA"]
+                        dic["Qid_pairs"] = ["NaN"]
                         xidx_start = one_sen.find(x)
                         xidx_end = xidx_start + len(x)
                         yidx_start = one_sen.find(y)

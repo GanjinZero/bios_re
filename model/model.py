@@ -137,8 +137,11 @@ class BagRE(nn.Module):
         if self.criterion == 'softmax':
             return self.loss_fn(logits, labels[bag_first_id])
         else:
-            ones = torch.eye(self.class_count).to(bag_id.device)
-            label = ones.index_select(0, labels[bag_first_id])
+            if len(labels.shape) == 1:
+                ones = torch.eye(self.class_count).to(bag_id.device)
+                label = ones.index_select(0, labels[bag_first_id])
+            else:
+                label = labels[bag_first_id].float()
             return self.loss_fn(logits, label)
 
     def configure_optimizers(self, args, train_dataloader):

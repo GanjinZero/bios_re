@@ -32,6 +32,8 @@ def read():
     cid_pair = {}
     tri = {}
     
+    str_cid_keys = set(str_cid.keys())
+
     #"Entity1", "Qid1", "Relation", "Entity2", "Qid2"
     
     for idx, line in enumerate(tqdm(open("/platform_tech/wikidata/wiki_sentence_1125/triplets_1119.txt", "r", encoding = "utf-8"))):
@@ -39,7 +41,7 @@ def read():
             continue
         t_t = line.strip().split("\t")
         
-        if t_t[0] not in str_cid.keys() or t_t[3] not in str_cid.keys():
+        if t_t[0] not in str_cid_keys or t_t[3] not in str_cid_keys:
             continue
         
         if (t_t[0], t_t[3]) not in tri.keys():
@@ -67,9 +69,11 @@ def read():
             cid_pair[cui_en2][0] = cid_pair[cui_en2][0] + (t_t[2], )
             cid_pair[cui_en2][1] = cid_pair[cui_en2][1] + (cui_en1, )
 
+    cid_pair_keys = set(cid_pair.keys())
+
 ####begin matching 
     print("################begin matching##################")
-    writer = open('/platform_tech/yuanzheng/bios_re/data/1202/raw.json', 'w', encoding="utf-8") 
+    writer = open('/platform_tech/yuanzheng/bios_re/data/1202/raw_quick.json', 'w', encoding="utf-8") 
     
     with open(ds_39g["raw_text_path"], 'r', encoding = 'utf-8') as fp1, open(ds_39g["tagged_text_path"], 'r', encoding = 'utf-8') as fp2:
         for l1 in tqdm(fp1):
@@ -90,15 +94,15 @@ def read():
                 for i in range(len(need_tag)):
                 
                     x = need_tag[i]
-                    if x not in str_cid.keys():
+                    if x not in str_cid_keys:
                         continue
                     x_id = str_cid[x]
-                    if x_id not in cid_pair.keys():
+                    if x_id not in cid_pair_keys:
                         continue
                         
                     #for y in need_tag[i+1:]:
                     for y in need_tag:
-                        if y not in str_cid.keys():
+                        if y not in str_cid_keys:
                             continue
                         y_id = str_cid[y]
                         if y_id not in cid_pair[x_id][1]:

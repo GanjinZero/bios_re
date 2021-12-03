@@ -139,10 +139,16 @@ class REDataset(Dataset):
         bag = self.bag_scope[index]
         if 0 < self.bag_size <= len(bag):
             bag = sample(bag, self.bag_size) 
-        rel = self.rel2id[bag[0]['relation']]
+        #rel = self.rel2id[bag[0]['relation']]
 
         bag_id = [index] * len(bag)
-        labels = [rel] * len(bag)
+
+        label = [0 for _ in range(len(self.rel2id))]
+        for rel in bag[0]['relation']:
+            if rel in self.rel2id:
+                label[self.rel2id[rel]] = 1
+        labels = [label] * len(bag)
+        #labels = [rel] * len(bag)
 
         input_ids = []
         attention_mask = []

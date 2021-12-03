@@ -72,10 +72,12 @@ def calculate_metric(yhat_raw, y, yhat):
     class_count = yhat_raw.shape[1]
 
     # micro-f1
-    label_count = y.shape[0]
+    #label_count = y.shape[0]
+    label_count = y.sum()
     predict_count = yhat.sum()
-    ones = torch.eye(class_count)
-    binary_label = ones.index_select(0, y)
+    #ones = torch.eye(class_count)
+    #binary_label = ones.index_select(0, y)
+    binary_label = y
     true_count = (yhat * binary_label).sum()
     precision = true_count / predict_count
     recall = true_count / label_count

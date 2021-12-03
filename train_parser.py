@@ -12,9 +12,9 @@ def get_train_parser():
     parser.add_argument('--truncated_length', type=str, default=128)
     parser.add_argument('--coder_truncated_length', type=str, default=32)
     
-    parser.add_argument('--bert_path', type=str, default='microsoft/BiomedNLP-PubMedBERT-base-uncased-abstract')
+    parser.add_argument('--bert_path', type=str, default='../plm/BiomedNLP-PubMedBERT-base-uncased-abstract')
     parser.add_argument('--pooler', type=str, default='entity', choices=['entity', 'cls'])
-    parser.add_argument('--coder_path', type=str, default='GanjinZero/UMLSBert_ENG')
+    parser.add_argument('--coder_path', type=str, default='../plm/coder_eng')
     parser.add_argument('--coder_pooler', type=str, default='cls', choices=['cls', 'mean'])
     parser.add_argument('--coder_freeze', action='store_true')
     

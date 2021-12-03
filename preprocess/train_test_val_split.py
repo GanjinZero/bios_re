@@ -72,6 +72,7 @@ def output(rel_lines, na_lines,
         return cui_pair.keys()
 
 def train_test_split(rel_path='../../data/sentence_coder_1117.json',
+                     na_path='',
                      output_path='../../data/1117_v2/'):
 
     try:
@@ -84,28 +85,80 @@ def train_test_split(rel_path='../../data/sentence_coder_1117.json',
     test_set = set()
     u_count = 0
 
+    train_idx = []
+    dev_idx = []
+    test_idx = []
     for line in tqdm(open(rel_path, 'r')):
         rel_line = eval(line.strip())
         cui0 = rel_line['h']['id']
         cui1 = rel_line['t']['id']
         cuis = "|".join([cui0, cui1])
-        if not (cuis in train_set or cuis in dev_set or cuis in test_set):
+        if cuis in train_set:
+            train_idx.append(line)
+        elif cuis in dev_set:
+            dev_idx.append(line)
+        elif cuis in test_set:
+            test_idx.append(line)
+        else:
             u_count += 1
             if u_count % 100 == 47:
                 dev_set.update([cuis])
+                dev_idx.append(line)
             elif u_count % 100 == 72:
                 test_set.update([cuis])
+                test_idx.append(line)
             else:
                 train_set.update([cuis])
-        if cuis in train_set:
-            with open(os.path.join(output_path, 'train.txt'), 'a+') as f:
+                train_idx.append(line)
+    """            
+    with open(os.path.join(output_path, 'train.txt'), 'w') as f:
+        for line in train_idx:
+            f.write(line.strip() + "\n")
+    with open(os.path.join(output_path, 'test.txt'), 'w') as f:
+        for line in test_idx:
+            f.write(line.strip() + "\n")
+    with open(os.path.join(output_path, 'dev.txt'), 'w') as f:
+        for line in dev_idx:
+            f.write(line.strip() + "\n")
+    """
+
+    if na_path:
+        train_idx = []
+        test_idx = []
+        dev_idx = []
+        for line in tqdm(open(na_path, 'r')):
+            rel_line = eval(line.strip())
+            cui0 = rel_line['h']['id']
+            cui1 = rel_line['t']['id']
+            if cuis in train_set:
+                train_idx.append(line)
+            elif cuis in dev_set:
+                dev_idx.append(line)
+            elif cuis in test_set:
+                test_idx.append(line)
+            else:
+                u_count += 1
+                if u_count % 100 == 47:
+                    dev_set.update([cuis])
+                    dev_idx.append(line)
+                elif u_count % 100 == 72:
+                    test_set.update([cuis])
+                    test_idx.append(line)
+                else:
+                    train_set.update([cuis])
+                    train_idx.append(line)
+
+        with open(os.path.join(output_path, 'train.txt'), 'a+') as f:
+            for line in train_idx:
                 f.write(line.strip() + "\n")
-        elif cuis in dev_set:
-            with open(os.path.join(output_path, 'dev.txt'), 'a+') as f:
+        with open(os.path.join(output_path, 'test.txt'), 'a+') as f:
+            for line in test_idx:
                 f.write(line.strip() + "\n")
-        elif cuis in test_set:
-            with open(os.path.join(output_path, 'test.txt'), 'a+') as f:
+        with open(os.path.join(output_path, 'dev.txt'), 'a+') as f:
+            for line in dev_idx:
                 f.write(line.strip() + "\n")
-   
+
+
 if __name__ == '__main__':
-    train_test_split()
+    train_test_split('../data/1202/raw.json', '../data/1203/raw_na.json', '../data/1203')
+    train_test_split('../data/1202/raw.json', '../data/1203/raw_na_10.json', '../data/1203_na10')
