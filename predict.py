@@ -11,7 +11,7 @@ from data_util import REDataset, my_collate_fn
 
 
 device = 'cuda'
-data_path = './data/1117_v2'
+data_path = './data/1203'
 
 MAX_COUNT = 10
 
@@ -65,7 +65,11 @@ def predict_one(model_path):
                         ent0 = test_datast.bert_tok.convert_tokens_to_string(ent0)
                         ent1 = test_datast.coder_tok.convert_ids_to_tokens(batch_gpu[7][i][batch_gpu[8][i]==1][2:-2])
                         ent1 = test_datast.bert_tok.convert_tokens_to_string(ent1)
-                        true_rel = id2rel[label[i].item()]
+                        #true_rel = [id2rel[x.item()] for x in label[i]]
+                        true_rel = []
+                        for idx, k in enumerate(label[i]):
+                            if k.item() > 0:
+                                true_rel.append(id2rel[idx])
                         pos1 = batch_gpu[3][i]
                         pos2 = batch_gpu[4][i]
                         if pos1 < pos2:
@@ -87,4 +91,5 @@ def predict_one(model_path):
 
     return
 
-predict_one('/media/sda1/GanjinZero/bios_re/output/entity_cls_False_0.1_one_binary_2_2e-05_16_16_0.0/epoch2.pth')
+#predict_one('/media/sda1/GanjinZero/bios_re/output/entity_cls_False_0.1_one_binary_2_2e-05_16_16_0.0/epoch2.pth')
+predict_one('output_1203/entity_cls_False_0.1_one_binary_2_2e-05_16_16_0.0_coder/epoch2.pth')

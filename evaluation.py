@@ -11,7 +11,7 @@ from data_util import REDataset, my_collate_fn
 
 
 device = 'cuda'
-data_path = './data/1117_v2'
+data_path = './data/1203'
 
 with open(os.path.join(data_path, 'rel2id.json'), 'r') as f:
     rel2id = json.load(f)
@@ -92,9 +92,11 @@ def calculate_metric(yhat_raw, y, yhat):
     # macro-f1
     macro_f1_list = []
     for i in range(class_count):
-        yhat_i = yhat[y==i]
-        binary_label_i = binary_label[y==i]
-        label_i_count = yhat_i.shape[0]
+        #yhat_i = yhat[y==i]
+        #binary_label_i = binary_label[y==i]
+        yhat_i = yhat[:,i]
+        binary_label_i = binary_label[:,i]
+        label_i_count = binary_label_i.sum()
         predict_i_count = yhat_i.sum()
         true_i_count = (yhat_i * binary_label_i).sum()
         precision_i = true_i_count / predict_i_count
@@ -109,4 +111,5 @@ def calculate_metric(yhat_raw, y, yhat):
     return metric, class_metric
 
 
-evaluate('/media/sda1/GanjinZero/bios_re/output/entity_cls_False_0.1_one_binary_2_2e-05_16_16_0.0_coder_debug/epoch1.pth')
+#evaluate('/media/sda1/GanjinZero/bios_re/output/entity_cls_False_0.1_one_binary_2_2e-05_16_16_0.0_coder_debug/epoch1.pth')
+evaluate('output_1203/entity_cls_False_0.1_one_binary_2_2e-05_16_16_0.0_coder/epoch2.pth')
