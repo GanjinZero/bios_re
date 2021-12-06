@@ -13,7 +13,13 @@ CODER + Mean Class-Wise Results:
 {'f1_instance of': 0.886191189289093, 'f1_subclass of': 0.7035647034645081, 'f1_parent taxon': 1.0, 'f1_subject has role': 0.8051947951316833, 'f1_cell component': 0.9934065341949463, 'f1_part of': 0.6614173650741577, 'f1_has part': 0.9029126167297363, 'f1_medical condition treated': 1.0, 'f1_drug or therapy used for treatment': 0.9879518151283264, 'f1_possible treatment': 1.0, 'f1_biological process': 0.9837133884429932, 'f1_molecular function': 0.9333333373069763, 'f1_found in taxon': 0.9940828680992126, 'f1_active ingredient in': 0.8333333134651184, 'f1_has active ingredient': 0.9230769276618958, 'f1_expressed in': 1.0, 'f1_symptoms and signs': 0.9615384340286255, 'f1_encoded by': 0.9411764740943909, 'f1_encodes': 0.8695652484893799, 'f1_significant drug interaction': 1.0}
 
 # Result 1203
-|   Setting    |   P   |   R   | Micro-F1 | Macro-F1 |
-| :----------: | :---: | :---: | :------: | :------: |
-| CODER + ONE  | 94.53 | 93.31 |  93.92   |  91.58   |
+|        Setting        |   P   |   R   | Micro-F1 | Macro-F1 |
+| :-------------------: | :---: | :---: | :------: | :------: |
+| CODER + ONE + 0.1 Neg | 94.53 | 93.31 |  93.92   |  91.58   |
+|  CODER + ONE + 1 Neg  | 91.82 | 86.94 |  89.31   |  85.06   |
+
+CODER + ONE + 0.1 Neg:
 {'f1_instance of': 0.955974817276001, 'f1_subclass of': 0.8633405566215515, 'f1_parent taxon': 0.9889840483665466, 'f1_subject has role': 0.9433962106704712, 'f1_cell component': 0.9736841917037964, 'f1_part of': 0.8372092843055725, 'f1_has part': 0.8958333134651184, 'f1_medical condition treated': 0.9638553857803345, 'f1_drug or therapy used for treatment': 0.9885057806968689, 'f1_possible treatment': 0.6666666865348816, 'f1_biological process': 0.9371981024742126, 'f1_molecular function': 1.0, 'f1_found in taxon': 0.9795917868614197, 'f1_active ingredient in': 0.8888888955116272, 'f1_has active ingredient': 0.9130434989929199, 'f1_expressed in': 0.9759036302566528, 'f1_symptoms and signs': 0.800000011920929, 'f1_encoded by': 0.971962571144104, 'f1_encodes': 0.971962571144104, 'f1_significant drug interaction': 0.800000011920929}
+
+CODER + ONE + 1 Neg:
+{'f1_instance of': 0.9377817511558533, 'f1_subclass of': 0.7987287640571594, 'f1_parent taxon': 0.9649122357368469, 'f1_subject has role': 0.8799999952316284, 'f1_cell component': 0.9527897238731384, 'f1_part of': 0.630630612373352, 'f1_has part': 0.8314606547355652, 'f1_medical condition treated': 0.8799999952316284, 'f1_drug or therapy used for treatment': 0.9056603312492371, 'f1_possible treatment': 0.5714285373687744, 'f1_biological process': 0.8844220638275146, 'f1_molecular function': 0.9302325248718262, 'f1_found in taxon': 0.9618768692016602, 'f1_active ingredient in': 0.800000011920929, 'f1_has active ingredient': 0.829268217086792, 'f1_expressed in': 0.9308176040649414, 'f1_symptoms and signs': 0.6440678238868713, 'f1_encoded by': 0.9433962106704712, 'f1_encodes': 0.9345794916152954, 'f1_significant drug interaction': 0.800000011920929}
