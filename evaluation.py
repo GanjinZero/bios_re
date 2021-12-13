@@ -105,6 +105,8 @@ def calculate_metric(yhat_raw, y, yhat):
             f1_i = 0
         else:
             f1_i = (2 * precision_i * recall_i / (precision_i + recall_i)).item()
+        class_metric[f'p_{id2rel[i]}'] = precision_i.item()
+        class_metric[f'r_{id2rel[i]}'] = recall_i.item()
         class_metric[f'f1_{id2rel[i]}'] = f1_i
         macro_f1_list.append(f1_i)
     metric['macro-f1'] = sum(macro_f1_list) / len(macro_f1_list)
@@ -112,4 +114,5 @@ def calculate_metric(yhat_raw, y, yhat):
 
 
 #evaluate('/media/sda1/GanjinZero/bios_re/output/entity_cls_False_0.1_one_binary_2_2e-05_16_16_0.0_coder_debug/epoch1.pth')
-evaluate('output_1203/entity_cls_False_0.1_one_binary_2_2e-05_16_16_0.0_coder/epoch2.pth')
+#evaluate('output_1203/entity_cls_False_0.1_one_binary_2_2e-05_16_16_0.0_coder/epoch2.pth')
+evaluate('output_1203_na10/entity_cls_False_0.1_one_binary_2_2e-05_16_16_0.0_coder/epoch2.pth')

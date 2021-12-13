@@ -191,6 +191,67 @@ def my_collate_fn(batch):
             output += (torch.LongTensor(tmp).reshape(batch_size, -1, dim_y),)
     return output
 
+
+class PredictOneDataset(REDataset):
+    def __init__(self, data_path, mode, bag_size, truncated_length, coder_truncated_length, bert_path, coder_path, debug=False):
+        self.data_path = data_path
+        self.mode = mode
+
+        self.bag_size = bag_size
+        self.truncated_length = truncated_length
+        self.coder_truncated_length = coder_truncated_length
+
+        self.bert_tok = AutoTokenizer.from_pretrained(bert_path)
+        if coder_path:
+            self.coder_tok = AutoTokenizer.from_pretrained(coder_path)
+        else:
+            self.coder_tok = self.bert_tok
+
+        self.path = os.path.join(data_path, mode)
+
+        self.rel2id_path = os.path.join(data_path, 'rel2id.json')
+        with open(self.rel2id_path, 'r') as f:
+            self.rel2id = json.load(f)
+
+        self.load(self.path, debug)
+
+    def load(self, path, debug=False):
+        f = open(path)
+
+        self.bag_scope = []
+        # self.name2id = {}
+        self.bag_name = []
+        self.bag_count = {}
+        self.facts = {}
+
+        idx = -1
+        for line in tqdm(f):
+            if debug:
+                if idx >= 100000:
+                    break
+            idx += 1
+            line = line.rstrip()
+            if len(line) > 0:
+                df = eval(line)
+                cuis = "|".join([df['h']['id'], df['t']['id']])
+            # if cuis not in self.name2id:
+            #     self.name2id[cuis] = len(self.name2id)
+            #     self.bag_scope.append([])
+            #     self.bag_name.append(cuis)
+            # if len(self.bag_scope[self.name2id[cuis]]) < 10 * self.bag_size:
+            #     self.bag_scope[self.name2id[cuis]].append(df)
+            if self.bag_count.get(cuis, 0) < self.bag_size:
+                self.bag_scope.append([df])
+                self.bag_name.append(cuis)
+                if not cuis in self.bag_count:
+                    self.bag_count[cuis] = 0
+                self.bag_count[cuis] += 1
+        f.close()
+
+        self.len = len(self.bag_scope)
+        
+        return
+
 if __name__ == '__main__':
     dev_dataset = REDataset('data/sample_data', 'dev', 3, 128, 30, 'bert-base-cased', 'GanjinZero/UMLSBert_ENG')
     xxx = dev_dataset[0]
