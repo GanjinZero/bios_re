@@ -30,9 +30,9 @@ def run(args):
     with open(os.path.join(output_path, 'args.json'), 'w') as f:
         json.dump(args.__dict__, f, indent=2)
 
-    train_dataset = REDataset(args.data_path, 'train', args.bag_size, args.truncated_length, args.coder_truncated_length, args.bert_path, args.coder_path, args.debug)
-    dev_dataset = REDataset(args.data_path, 'dev', args.bag_size, args.truncated_length, args.coder_truncated_length, args.bert_path, args.coder_path)
-    test_datast = REDataset(args.data_path, 'test', args.bag_size, args.truncated_length, args.coder_truncated_length, args.bert_path, args.coder_path)
+    train_dataset = REDataset(args.data_path, 'train', args.bag_size, args.truncated_length, args.coder_truncated_length, args.bert_path, args.coder_path, args.reverse_train, args.limit_dis, args.debug)
+    dev_dataset = REDataset(args.data_path, 'dev', args.bag_size, args.truncated_length, args.coder_truncated_length, args.bert_path, args.coder_path, False, args.limit_dis)
+    test_datast = REDataset(args.data_path, 'test', args.bag_size, args.truncated_length, args.coder_truncated_length, args.bert_path, args.coder_path, False, args.limit_dis)
 
     train_dataloader = DataLoader(train_dataset, batch_size=args.batch_size, collate_fn=my_collate_fn, shuffle=True, num_workers=1, pin_memory=True)
     dev_dataloader = DataLoader(dev_dataset, batch_size=args.batch_size, collate_fn=my_collate_fn, shuffle=False, num_workers=1, pin_memory=True)

@@ -22,7 +22,8 @@ def pad(l, pad_id, pad_length):
 
 
 class REDataset(Dataset):
-    def __init__(self, data_path, mode, bag_size, truncated_length, coder_truncated_length, bert_path, coder_path, debug=False):
+    def __init__(self, data_path, mode, bag_size, truncated_length, coder_truncated_length, bert_path, coder_path, 
+                 reverse_train=False, limit_dis=None, debug=False):
         self.data_path = data_path
         self.mode = mode
 
@@ -42,6 +43,12 @@ class REDataset(Dataset):
         with open(self.rel2id_path, 'r') as f:
             self.rel2id = json.load(f)
 
+        self.reverse_train = reverse_train
+        if limit_dis is not None:
+            self.limit_dis = [int(x) for x in limit_dis.split(',')]
+        else:
+            self.limit_dis = None
+
         self.load(self.path, debug)
 
     def load(self, path, debug=False):
@@ -51,6 +58,10 @@ class REDataset(Dataset):
         self.name2id = {}
         self.bag_name = []
         self.facts = {}
+
+        if self.reverse_train:
+            reverse_cuis_set = set()
+            reverse_cuis_line = []
 
         idx = -1
         for line in tqdm(f):
@@ -62,12 +73,40 @@ class REDataset(Dataset):
             if len(line) > 0:
                 df = eval(line)
                 cuis = "|".join([df['h']['id'], df['t']['id']])
+                dis = int(df['distance'])
+                if self.limit_dis is not None:
+                    if dis > self.limit_dis[1] or dis < self.limit_dis[0]:
+                        continue
             if cuis not in self.name2id:
                 self.name2id[cuis] = len(self.name2id)
                 self.bag_scope.append([])
                 self.bag_name.append(cuis)
             if len(self.bag_scope[self.name2id[cuis]]) < 10 * self.bag_size:
                 self.bag_scope[self.name2id[cuis]].append(df)
+            if df['relation'][0] != "NA" and self.reverse_train:
+                reverse_cuis = "|".join([df['t']['id'], df['h']['id']])
+                reverse_cuis_line.append(df)
+                reverse_cuis_set.update([reverse_cuis])
+
+        if self.reverse_train:
+            set_bag_name = set(self.bag_name)
+            for df in reverse_cuis_line:
+                reverse_cuis = "|".join([df['t']['id'], df['h']['id']])
+                if reverse_cuis in set_bag_name:
+                    continue
+                new_df = df.copy()
+                new_df['h'] = df['t']
+                new_df['t'] = df['h']
+                new_df['relation'] = ["NA"]
+                new_df["Qid_pairs"]: ["NaN"] 
+
+                if reverse_cuis not in self.name2id:
+                    self.name2id[reverse_cuis] = len(self.name2id)
+                    self.bag_scope.append([])
+                    self.bag_name.append(reverse_cuis)
+                if len(self.bag_scope[self.name2id[reverse_cuis]]) < 10 * self.bag_size:
+                    self.bag_scope[self.name2id[reverse_cuis]].append(new_df)
+
         f.close()
 
         self.len = len(self.bag_scope)

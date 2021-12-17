@@ -7,6 +7,10 @@ from model.model import RelationExtractionEncoder, BagRE
 def get_output_folder_name(args):
     config = [args.pooler, args.coder_pooler, args.coder_freeze, args.rep_dropout, args.aggr, args.criterion, args.train_epochs,
               args.learning_rate, args.bag_size, args.batch_size * args.n_gpu * args.gradient_accumulation_steps, args.warmup_ratio]
+    if args.reverse_train:
+        config.append('rev')
+    if args.limit_dis is not None:
+        config.append(str(args.limit_dis))
     if args.coder_path:
         config.append('coder')
     if args.debug:

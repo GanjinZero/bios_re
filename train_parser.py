@@ -23,6 +23,9 @@ def get_train_parser():
     parser.add_argument('--aggr', type=str, default='one')
     parser.add_argument('--criterion', type=str, default='binary')
     
+    parser.add_argument('--reverse_train', action='store_true')
+    parser.add_argument('--limit_dis', type=str, default=None)
+    
     parser.add_argument('--debug', action='store_true')
     parser.add_argument('--device', type=str, default='cuda')
     parser.add_argument('--learning_rate', type=float, default=2e-5)
