@@ -14,6 +14,7 @@ class BIOS:
         self.cui2term = {}
         self.term2cui = {}
         self.term2string = {}
+        self.string2term = {}
         
         for line in lines:
             c, t, s = line.strip().split('\t')
@@ -22,6 +23,7 @@ class BIOS:
             self.cui2term[c].append(t)
             self.term2cui[t] = c
             self.term2string[t] = s
+            self.string2term[s] = t
 
         print(f'Load BIOS @ {self.data_ver}')
         print(f'Concept count: {len(self.cui2term)}')

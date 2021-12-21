@@ -25,23 +25,6 @@ with open('../data/sty_pair.json', 'r') as f:
 
 def read():
 
-    term = {}
-    str_cid = {} #str:cid
-
-    # cid tid str
-    for idx, line in enumerate(open("/platform_tech/wikidata/Concepts 2021-11-05.txt", "r", encoding = "utf-8")):
-        if idx == 0:
-            continue
-        one = line.strip().split("\t")
-        str_cid[one[2]] = one[0]
-        term[one[2]] = 1
-
-    cnt = 0
-    cid_pair = {}
-    tri = {}
-    
-    #"Entity1", "Qid1", "Relation", "Entity2", "Qid2"
-    
     for idx, line in enumerate(tqdm(open("/platform_tech/wikidata/wiki_sentence_1125/triplets_1119.txt", "r", encoding = "utf-8"))):
         if idx == 0:
             continue
