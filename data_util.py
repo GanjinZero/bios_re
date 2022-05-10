@@ -73,6 +73,8 @@ class REDataset(Dataset):
             if len(line) > 0:
                 df = eval(line)
                 cuis = "|".join([df['h']['id'], df['t']['id']])
+                if cuis.find('CN00016533') >= 0:
+                    continue
                 dis = int(df['distance'])
                 if self.limit_dis is not None:
                     if dis > self.limit_dis[1] or dis < self.limit_dis[0]:
@@ -183,9 +185,10 @@ class REDataset(Dataset):
         bag_id = [index] * len(bag)
 
         label = [0 for _ in range(len(self.rel2id))]
-        for rel in bag[0]['relation']:
-            if rel in self.rel2id:
-                label[self.rel2id[rel]] = 1
+        if 'relation' in bag[0]:
+            for rel in bag[0]['relation']:
+                if rel in self.rel2id:
+                    label[self.rel2id[rel]] = 1
         labels = [label] * len(bag)
         #labels = [rel] * len(bag)
 

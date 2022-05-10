@@ -1,0 +1,21 @@
+{
+  "0": "is a",
+  "1": "part of",
+  "11": "inverse part of",
+  "2": "may treat",
+  "12": "inverse may treat",
+  "3": "involved in",
+  "4": "found in taxon",
+  "5": "active ingredient in",
+  "15": "inverse active ingredient in",
+  "6": "expressed in",
+  "7": "may cause",
+  "8": "encoded by",
+  "18": "inverse encoded by",
+  "9": "significant drug interaction",
+  "10": "inverse is a",
+  "13": "inverse involved in",
+  "14": "inverse found in taxon",
+  "16": "inverse expressed in",
+  "17": "inverse may cause"
+}

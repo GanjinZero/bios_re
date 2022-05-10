@@ -11,14 +11,19 @@ from data_util import REDataset, my_collate_fn
 
 
 device = 'cuda'
-data_path = './data/1203'
+data_path = './data/1224'
 
 with open(os.path.join(data_path, 'rel2id.json'), 'r') as f:
     rel2id = json.load(f)
-id2rel = {id:rel for rel, id in rel2id.items()}
+if os.path.exists(os.path.join(data_path, 'id2rel.json')):
+    with open(os.path.join(data_path, 'id2rel.json'), 'r') as f:
+        id2rel = json.load(f)
+    id2rel = {int(id):rel for id, rel in id2rel.items()}
+else:
+    id2rel = {id:rel for rel, id in rel2id.items()}
 
 
-def evaluate(model_path):
+def evaluate(model_path, limit_dis=None):
     with open(os.path.join(os.path.dirname(model_path), 'args.json'), 'r') as f:
         config = json.load(f)
     bag_size = config['bag_size']
@@ -28,7 +33,7 @@ def evaluate(model_path):
     bert_path = config['bert_path']
     coder_path = config['coder_path']
 
-    test_datast = REDataset(data_path, 'test', bag_size, truncated_length, coder_truncated_length, bert_path, coder_path)
+    test_datast = REDataset(data_path, 'test', bag_size, truncated_length, coder_truncated_length, bert_path, coder_path, limit_dis=limit_dis)
     test_dataloader = DataLoader(test_datast, batch_size=batch_size, collate_fn=my_collate_fn, shuffle=False, num_workers=1, pin_memory=True)
 
     model = torch.load(model_path).to(device)
@@ -54,14 +59,18 @@ def evaluate(model_path):
 
     yhat = (yhat_raw >= 0).float()
     metric, class_metric = calculate_metric(yhat_raw, y, yhat)
+    if limit_dis is not None:
+        print(limit_dis)    
+    else:
+        print(class_metric)
     print(metric)
-    print(class_metric)
 
-    epoch_nb = os.path.basename(model_path).split('.')[0]
-    with open(os.path.join(os.path.dirname(model_path), f'{epoch_nb}_metric.json'), 'w') as f:
-        json.dump(metric, f, indent=2)
-    with open(os.path.join(os.path.dirname(model_path), f'{epoch_nb}_class_metric.json'), 'w') as f:
-        json.dump(class_metric, f, indent=2)
+    if limit_dis is None:
+        epoch_nb = os.path.basename(model_path).split('.')[0]
+        with open(os.path.join(os.path.dirname(model_path), f'{epoch_nb}_metric.json'), 'w') as f:
+            json.dump(metric, f, indent=2)
+        with open(os.path.join(os.path.dirname(model_path), f'{epoch_nb}_class_metric.json'), 'w') as f:
+            json.dump(class_metric, f, indent=2)
 
     return
 
@@ -69,8 +78,9 @@ def evaluate(model_path):
 def calculate_metric(yhat_raw, y, yhat):
     metric = {}
     class_metric = {}
-    class_count = yhat_raw.shape[1]
-
+    #class_count = yhat_raw.shape[1]
+    class_count = len(id2rel)
+    #print(class_count)
     # micro-f1
     #label_count = y.shape[0]
     label_count = y.sum()
@@ -115,4 +125,13 @@ def calculate_metric(yhat_raw, y, yhat):
 
 #evaluate('/media/sda1/GanjinZero/bios_re/output/entity_cls_False_0.1_one_binary_2_2e-05_16_16_0.0_coder_debug/epoch1.pth')
 #evaluate('output_1203/entity_cls_False_0.1_one_binary_2_2e-05_16_16_0.0_coder/epoch2.pth')
-evaluate('output_1203_na10/entity_cls_False_0.1_one_binary_2_2e-05_16_16_0.0_coder/epoch2.pth')
+#evaluate('output_1203_na10/entity_cls_False_0.1_one_binary_2_2e-05_16_16_0.0_coder/epoch2.pth')
+#evaluate('output_1203/entity_cls_False_0.1_one_binary_2_2e-05_16_16_0.0_rev_3,10_coder/epoch2.pth')
+#evaluate('output_1203_na10/entity_cls_False_0.1_one_binary_2_2e-05_16_16_0.0_rev_3,10_coder/epoch2.pth')
+#evaluate('output_1221/entity_cls_False_0.1_one_binary_2_2e-05_16_16_0.0_3,10_coder/epoch2.pth')
+#evaluate('output_1224/entity_cls_False_0.1_one_binary_2_2e-05_16_16_0.0_3,10_coder/epoch2.pth')
+#evaluate('output_1224_ablation/entity_cls_False_0.1_one_binary_2_2e-05_16_16_0.0_3,10/epoch2.pth')
+for x in range(3,11):
+    evaluate('output_1224_ablation/entity_cls_False_0.1_one_binary_2_2e-05_16_16_0.0_3,10/epoch2.pth', limit_dis=f'{x},{x}')
+
+
