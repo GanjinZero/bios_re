@@ -6,6 +6,12 @@ BIOS: An Algorithmically Generated Biomedical Knowledge Graph
 
 This repo is under construction.
 
+# Environment
+Software dependencies are listed in **requirements.txt**. At least one GPU is needed for training.
+
+# Install guide
+Just clone the github repo.
+
 # Train
 ```
 sh run.sh
